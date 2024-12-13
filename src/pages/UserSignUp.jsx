@@ -1,6 +1,49 @@
+import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../providers/AuthProvider";
+import Swal from "sweetalert2";
 
 const UserSignUp = () => {
+  const { createUser } = useContext(AuthContext);
+
+  const handleUserSignUp = (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const email = form.email.value;
+    const password = form.password.value;
+    // const user = { email, password };
+    // console.log(user);
+
+    // create user
+    createUser(email, password)
+      .then((result) => {
+        console.log(result.user);
+
+        //user added to the database
+        const createdAt = result.user.metadata.creationTime;
+        const user = { email, createdAt };
+        axios
+          .post("http://localhost:5000/user", user)
+          .then((data) => {
+            if (data.data.insertedId) {
+              console.log("data added to the database");
+            }
+          });
+        Swal.fire({
+          title: "Success!",
+          text: "Account created successfully",
+          icon: "success",
+          confirmButtonText: "ok",
+        });
+        form.reset();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div>
       <div className="flex justify-center items-center h-screen bg-gray-100">
@@ -10,7 +53,7 @@ const UserSignUp = () => {
           <h2 className="text-2xl font-bold text-center text-gray-700">
             Register
           </h2>{" "}
-          <form>
+          <form onSubmit={handleUserSignUp}>
             <div className="mb-4">
               {" "}
               <label
@@ -43,17 +86,22 @@ const UserSignUp = () => {
                 required
               />{" "}
             </div>{" "}
-           
             <div className="">
               {" "}
-              <button
+              <Button
+                gradientDuoTone="purpleToPink"
                 type="submit"
-                className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
+                className="text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
               >
                 {" "}
                 Register{" "}
-              </button>{" "}
-              <p className="py-3">Already have an account? <Link to={'/login'} className="text-blue-500">Login</Link></p>
+              </Button>{" "}
+              <p className="py-3">
+                Already have an account?{" "}
+                <Link to={"/login"} className="text-blue-500">
+                  Login
+                </Link>
+              </p>
             </div>{" "}
           </form>{" "}
         </div>{" "}

@@ -1,6 +1,39 @@
+import axios from "axios";
+import { Button } from "flowbite-react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../providers/AuthProvider";
 
 const Login = () => {
+  const {signInUser} = useContext(AuthContext)
+  
+  const handleLogin = (event) => {
+    event.preventDefault();
+    const form = event.target;
+    const email = form.email.value;
+    const password = form.password.value;
+
+   
+
+    signInUser(email, password)
+      .then((result) => {
+        const loggedUser = result.user;
+        // console.log(loggedUser);
+
+        //get token
+        const user = { email };
+        axios
+          .post("http://localhost:5000/user", user)
+          .then((res) => {
+            console.log(res.data);
+            
+          });
+     
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   return (
     <div>
       <div>
@@ -9,9 +42,9 @@ const Login = () => {
           <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-md">
             {" "}
             <h2 className="text-2xl font-bold text-center text-gray-700">
-             Login
+              Login
             </h2>{" "}
-            <form>
+            <form onSubmit={handleLogin}>
               <div className="mb-4">
                 {" "}
                 <label
@@ -46,12 +79,13 @@ const Login = () => {
               </div>{" "}
               <div className="">
                 {" "}
-                <button
+                <Button
+                  gradientDuoTone="purpleToBlue"
                   type="submit"
-                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
+                  className=" text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
                 >
                   Login
-                </button>
+                </Button>
                 <p className="py-3">
                   Don't have an account?{" "}
                   <Link to={"/signup"} className="text-blue-500">
